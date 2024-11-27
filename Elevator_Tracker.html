@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>310관 엘리베이터 이동 경로 확인 시스템</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        h1 { margin-top: 20px; }
+        .container { display: flex; justify-content: center; gap: 20px; margin-top: 50px; }
+        .elevator-wrapper { text-align: center; }
+        .elevator { 
+            position: relative; 
+            width: 50px; 
+            height: 540px; /* 전체 높이 */
+            border: 2px solid black; 
+            background: #f9f9f9; 
+            overflow: hidden; 
+            margin-bottom: 10px; 
+        }
+        .floor { 
+            position: absolute; 
+            width: 100%; 
+            height: 30px; 
+            border-bottom: 1px solid #ddd; 
+            text-align: center; 
+            font-size: 12px; 
+            line-height: 30px; 
+        }
+        .floor.underground { background: #ffe6e6; } /* 지하층 */
+        .floor.aboveground { background: #e6f7ff; } /* 지상층 */
+        .elevator-box { 
+            position: absolute; 
+            width: 100%; 
+            height: 30px; 
+            background: #4caf50; 
+            color: white; 
+            text-align: center; 
+            line-height: 30px; 
+            transition: bottom 0.3s linear; /* 이동 시간 */
+        }
+        .elevator-info { 
+            font-size: 14px; 
+            color: #333; 
+        }
+        .elevator-name { font-weight: bold; }
+        .elevator-target { color: #007BFF; }
+        .explanation-container {
+            margin-top: 30px;
+            text-align: left;  /* 왼쪽 정렬 */
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .explanation {
+            margin-bottom: 10px;
+        }
+        .explanation strong {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>310관 엘리베이터 이동 경로 확인 시스템</h1>
+    <div class="container">
+        <div class="elevator-wrapper" id="wrapperA">
+            <div class="elevator" id="elevatorA"></div>
+            <div class="elevator-info">
+                <span class="elevator-name">A</span>: 
+                <span class="elevator-target" id="targetA"></span>
+            </div>
+        </div>
+        <div class="elevator-wrapper" id="wrapperB">
+            <div class="elevator" id="elevatorB"></div>
+            <div class="elevator-info">
+                <span class="elevator-name">B</span>: 
+                <span class="elevator-target" id="targetB"></span>
+            </div>
+        </div>
+        <div class="elevator-wrapper" id="wrapperC">
+            <div class="elevator" id="elevatorC"></div>
+            <div class="elevator-info">
+                <span class="elevator-name">C</span>: 
+                <span class="elevator-target" id="targetC"></span>
+            </div>
+        </div>
+        <div class="elevator-wrapper" id="wrapperD">
+            <div class="elevator" id="elevatorD"></div>
+            <div class="elevator-info">
+                <span class="elevator-name">D</span>: 
+                <span class="elevator-target" id="targetD"></span>
+            </div>
+        </div>
+        <div class="elevator-wrapper" id="wrapperE">
+            <div class="elevator" id="elevatorE"></div>
+            <div class="elevator-info">
+                <span class="elevator-name">E</span>: 
+                <span class="elevator-target" id="targetE"></span>
+            </div>
+        </div>
+        <div class="elevator-wrapper" id="wrapperF">
+            <div class="elevator" id="elevatorF"></div>
+            <div class="elevator-info">
+                <span class="elevator-name">F</span>: 
+                <span class="elevator-target" id="targetF"></span>
+            </div>
+        </div>
+        <div class="elevator-wrapper" id="wrapperG">
+            <div class="elevator" id="elevatorG"></div>
+            <div class="elevator-info">
+                <span class="elevator-name">G</span>: 
+                <span class="elevator-target" id="targetG"></span>
+            </div>
+        </div>
+        <div class="elevator-wrapper" id="wrapperH">
+            <div class="elevator" id="elevatorH"></div>
+            <div class="elevator-info">
+                <span class="elevator-name">H</span>: 
+                <span class="elevator-target" id="targetH"></span>
+            </div> 
+        </div>
+
+        <div class="explanation-container">
+            <div class="explanation">
+                <strong>A:</strong> <span id="descA">B3 || 12</span>
+            </div>
+            <div class="explanation">
+                <strong>B:</strong> <span id="descB">B3, B2, B1, 1, 3, 6, 9, 12</span>
+            </div>
+            <div class="explanation">
+                <strong>C:</strong> <span id="descC">1, 5, 8, 11</span>
+            </div>
+            <div class="explanation">
+                <strong>D:</strong> <span id="descD">1, 4, 7, 10</span>
+            </div>
+            <div class="explanation">
+                <strong>E:</strong> <span id="descE">1, 2, 4, 6, 8</span>
+            </div>
+            <div class="explanation">
+                <strong>F:</strong> <span id="descF">1, 3, 5, 7, 9</span>
+            </div>
+            <div class="explanation">
+                <strong>G:</strong> <span id="descG">B6 || 9</span>
+            </div>
+            <div class="explanation">
+                <strong>H:</strong> <span id="descH">B6, B5, B4, B3, 1, 3, 6, 9</span>
+            </div>
+        </div>
+        
+
+    </div>
+    <script>
+        const elevators = [
+            { id: "elevatorA", floors: [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], position: 1, target: 1 },  
+            { id: "elevatorB", floors: [-5, -4, -3, -2, -1, 0, 1, 3, 6, 9, 12], position: 1, target: 1 },  
+            { id: "elevatorC", floors: [1, 5, 8, 11], position: 1, target: 1 },   
+            { id: "elevatorD", floors: [1, 4, 7, 10], position: 1, target: 1 },  
+            { id: "elevatorE", floors: [1, 2, 4, 6, 8], position: 1, target: 1 },  
+            { id: "elevatorF", floors: [1, 3, 5, 7, 9], position: 1, target: 1 },  
+            { id: "elevatorG", floors: [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9], position: 9, target: 9 },             
+            { id: "elevatorH", floors: [-5, -4, -3, -2, -1, 0, 1, 3, 6, 9], position: 1, target: 1 }    
+        ];
+
+        const floorHeight = 30; // 각 층의 높이(px)
+
+        // 층 번호를 텍스트로 변환하는 함수
+        function getFloorText(floor) {
+            if (floor === 0) return "B1"; // 0층 -> B1
+            if (floor < 0) return `B${Math.abs(floor) + 1}`; // 지하
+            return `${floor}F`; // 지상
+        }
+
+        // 층 생성
+        document.querySelectorAll('.elevator').forEach((elevator) => {
+            for (let i = -5; i <= 12; i++) {
+                const floor = document.createElement('div');
+                floor.classList.add('floor');
+                floor.classList.add(i < 1 ? 'underground' : 'aboveground'); // 스타일 적용
+                floor.textContent = getFloorText(i);
+                floor.style.bottom = `${(i + 5) * floorHeight}px`; // 위치 계산
+                elevator.appendChild(floor);
+            }
+        });
+
+        // 엘리베이터 이동 함수
+        function moveElevators() {
+            elevators.forEach((elevator) => {
+                const el = document.getElementById(elevator.id);
+                const targetEl = document.getElementById(`target${elevator.id.slice(-1)}`);
+                let box = el.querySelector('.elevator-box');
+                if (!box) {
+                    box = document.createElement('div');
+                    box.classList.add('elevator-box');
+                    el.appendChild(box);
+                }
+
+                // 목표층 표시 업데이트
+                targetEl.textContent = getFloorText(elevator.target);
+
+                // 목표층에 도착하면 새로운 목표 선택 및 대기
+                if (elevator.position === elevator.target) {
+                    setTimeout(() => {
+                        elevator.target = elevator.floors[Math.floor(Math.random() * elevator.floors.length)];
+                    }, 2000); // 도착 시 2초 대기
+                } else {
+                    // 한 층씩 이동
+                    elevator.position += (elevator.target > elevator.position) ? 1 : -1;
+                }
+
+                // 엘리베이터 위치 및 텍스트 업데이트
+                const visualPosition = (elevator.position + 5) * floorHeight;
+                box.style.bottom = `${visualPosition}px`;
+                box.textContent = getFloorText(elevator.position);
+            });
+        }
+
+        setInterval(moveElevators, 1000); // 층 이동 시간: 1.5초
+    </script>
+</body>
+</html>
